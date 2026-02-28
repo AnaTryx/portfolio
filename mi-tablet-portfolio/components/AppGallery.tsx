@@ -2,14 +2,14 @@
 'use client';
 
 import React from 'react';
-import { X, Heart, MoreHorizontal } from 'lucide-react'; // Iconos para que se vea pro
+import Image from 'next/image';
+import { X, Heart, MoreHorizontal } from 'lucide-react';
 
 interface AppGalleryProps {
   onClose: () => void;
 }
 
 const AppGallery = ({ onClose }: AppGalleryProps) => {
-  // Asegúrate de que las fotos existan en public/photos/...
   const photos = [
     { id: 1, title: 'Noche de código', src: '/photos/me/coding.jpg' },
     { id: 2, title: 'ICPC 2025', src: '/photos/me/icpc.jpg' }, 
@@ -21,45 +21,44 @@ const AppGallery = ({ onClose }: AppGalleryProps) => {
 
   return (
     <div className="absolute inset-0 flex items-center justify-center z-[200] p-4 bg-black/20 backdrop-blur-sm">
-      <div className="w-full max-w-4xl bg-white/95 backdrop-blur-md rounded-[40px] shadow-2xl overflow-hidden flex flex-col h-[80vh] animate-in fade-in zoom-in duration-300 border border-white/20">
+      {/* Contenedor adaptado a Modo Oscuro */}
+      <div className="w-full max-w-4xl bg-white/95 dark:bg-zinc-950/95 backdrop-blur-md rounded-[40px] shadow-2xl overflow-hidden flex flex-col h-[80vh] animate-in fade-in zoom-in duration-300 border border-white/20 dark:border-zinc-800 transition-colors duration-500">
         
         {/* Header Estilo Galería */}
         <div className="p-8 pb-4 flex justify-between items-center">
           <div>
-            <h2 className="text-3xl font-bold text-zinc-900 tracking-tight">Galería</h2>
-            <p className="text-zinc-500 text-sm font-medium italic">Álbum: Personal • {photos.length} elementos</p>
+            <h2 className="text-3xl font-bold text-zinc-900 dark:text-white tracking-tight">Galería</h2>
+            <p className="text-zinc-500 dark:text-zinc-400 text-sm font-medium italic">Álbum: Personal • {photos.length} elementos</p>
           </div>
           <div className="flex gap-2">
-            <button className="w-10 h-10 rounded-full bg-zinc-100 flex items-center justify-center text-zinc-500 hover:bg-zinc-200 transition-colors">
+            <button className="w-10 h-10 rounded-full bg-zinc-100 dark:bg-zinc-900 flex items-center justify-center text-zinc-500 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-colors">
                 <MoreHorizontal size={20} />
             </button>
             <button 
                 onClick={onClose}
-                className="w-10 h-10 rounded-full bg-zinc-100 flex items-center justify-center text-zinc-500 hover:bg-zinc-200 transition-colors"
+                className="w-10 h-10 rounded-full bg-zinc-100 dark:bg-zinc-900 flex items-center justify-center text-zinc-500 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-colors"
             >
                 <X size={20} />
             </button>
           </div>
         </div>
 
-        {/* Grid de Fotos */}
+        {/* Grid de Fotos Optimizado */}
         <div className="flex-1 overflow-y-auto p-8 pt-4 scrollbar-hide">
           <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
             {photos.map((photo) => (
               <div 
                 key={photo.id} 
-                className="group relative aspect-square bg-zinc-100 rounded-[32px] overflow-hidden cursor-pointer shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
+                className="group relative aspect-square bg-zinc-100 dark:bg-zinc-900 rounded-[32px] overflow-hidden cursor-pointer shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-transparent dark:border-zinc-800"
               >
-                {/* LA CORRECCIÓN: Quitamos el prefijo /images/ porque ya está en el objeto */}
-                <img 
+                {/* OPTIMIZACIÓN CON NEXT/IMAGE */}
+                <Image 
                   src={photo.src} 
                   alt={photo.title} 
-                  className="object-cover w-full h-full transition-transform duration-700 group-hover:scale-110"
-                  onError={(e) => {
-                    // Si la foto no existe, muestra un color sólido en lugar de un icono roto
-                    e.currentTarget.style.display = 'none';
-                    e.currentTarget.parentElement!.classList.add('bg-zinc-200');
-                  }}
+                  fill // Ocupa todo el contenedor aspect-square
+                  sizes="(max-width: 768px) 50vw, 33vw" // Optimiza la descarga según el tamaño de pantalla
+                  className="object-cover transition-transform duration-700 group-hover:scale-110"
+                  // placeholder="blur" // Podrías usarlo si tuvieras los base64
                 /> 
                 
                 {/* Overlay al hacer Hover */}

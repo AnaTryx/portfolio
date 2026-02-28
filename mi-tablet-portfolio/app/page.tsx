@@ -56,7 +56,7 @@ export default function TabletPage() {
                   {dayName}
                 </div>
               </div>
-              <span className="text-black text-xs font-medium drop-shadow-md">Calendario</span>
+              <span className="text-black dark:text-white text-xs font-medium drop-shadow-md">Calendario</span>
             </button>
           </div>
 
