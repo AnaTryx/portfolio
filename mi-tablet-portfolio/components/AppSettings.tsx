@@ -2,6 +2,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Image from 'next/image'; // 1. Importamos el optimizador
 import { 
   X, Palette, Monitor, Info, User, Check, 
   Instagram, Github, Mail, ExternalLink, Moon, Sun 
@@ -21,19 +22,19 @@ const AppSettings = ({ onClose, setWallpaper, currentWallpaper }: {
   }, []);
 
   const toggleDarkMode = () => {
-    if (isDarkMode) {
-      document.documentElement.classList.remove('dark');
-      setIsDarkMode(false);
-    } else {
+    const newMode = !isDarkMode;
+    setIsDarkMode(newMode);
+    if (newMode) {
       document.documentElement.classList.add('dark');
-      setIsDarkMode(true);
+    } else {
+      document.documentElement.classList.remove('dark');
     }
   };
 
   const wallpapers = [
-    { id: 'minimalist', url: '/photos/wallpaper/Wallpaper1.jpg', image: '/photos/wallpaper/Wallpaper1.jpg' },
-    { id: 'cute', url: '/photos/wallpaper/Wallpaper2.jpg', image: '/photos/wallpaper/Wallpaper2.jpg' },
-    { id: 'ocean', url: '/photos/wallpaper/Wallpaper3.jpg', image: '/photos/wallpaper/Wallpaper3.jpg' },
+    { id: 'minimalist', url: '/photos/wallpaper/Wallpaper1.jpg' },
+    { id: 'cute', url: '/photos/wallpaper/Wallpaper2.jpg' },
+    { id: 'ocean', url: '/photos/wallpaper/Wallpaper3.jpg' },
   ];
 
   const socialAccounts = [
@@ -63,10 +64,9 @@ const AppSettings = ({ onClose, setWallpaper, currentWallpaper }: {
   return (
     <div className="fixed inset-0 z-[200] flex items-center justify-center p-2 sm:p-4 bg-black/40 backdrop-blur-sm animate-in fade-in zoom-in duration-300">
       
-      {/* CONTENEDOR PRINCIPAL: Cambia de blanco a negro puro */}
       <div className="bg-white dark:bg-black w-full max-w-3xl h-[90vh] sm:h-[580px] rounded-[40px] shadow-2xl flex flex-col sm:flex-row overflow-hidden border border-white/20 dark:border-zinc-800 transition-colors duration-500">
         
-        {/* Sidebar Lateral: Más oscuro en dark mode */}
+        {/* Sidebar Lateral */}
         <div className="w-full sm:w-64 bg-zinc-50 dark:bg-zinc-900/50 border-b sm:border-b-0 sm:border-r border-zinc-200 dark:border-zinc-800 p-4 sm:p-6 flex flex-row sm:flex-col gap-2 overflow-x-auto sm:overflow-x-visible">
           <h2 className="hidden sm:block text-xl font-bold mb-6 text-zinc-800 dark:text-white px-2 tracking-tight">Ajustes</h2>
           
@@ -99,10 +99,7 @@ const AppSettings = ({ onClose, setWallpaper, currentWallpaper }: {
         {/* Contenido Principal */}
         <div className="flex-1 flex flex-col min-h-0 bg-white dark:bg-black transition-colors duration-500">
           <div className="flex justify-end p-6 pb-2">
-            <button 
-              onClick={onClose}
-              className="p-2 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors text-zinc-400 hover:text-zinc-800 dark:hover:text-white"
-            >
+            <button onClick={onClose} className="p-2 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors text-zinc-400 hover:text-zinc-800 dark:hover:text-white">
               <X size={24} />
             </button>
           </div>
@@ -118,15 +115,17 @@ const AppSettings = ({ onClose, setWallpaper, currentWallpaper }: {
                       <div 
                         key={wp.id}
                         onClick={() => setWallpaper(wp.url)}
-                        className={`
-                          group h-28 rounded-[24px] cursor-pointer hover:scale-[1.03] active:scale-95 
-                          transition-all shadow-md border-4 flex items-center justify-center 
-                          relative overflow-hidden
-                          ${currentWallpaper === wp.url ? 'border-blue-500' : 'border-white dark:border-zinc-800'}
-                        `}
+                        className={`group h-28 rounded-[24px] cursor-pointer hover:scale-[1.03] active:scale-95 transition-all shadow-md border-4 flex items-center justify-center relative overflow-hidden ${currentWallpaper === wp.url ? 'border-blue-500' : 'border-white dark:border-zinc-800'}`}
                       >
-                        <img src={wp.image} className="absolute inset-0 w-full h-full object-cover" alt="Wallpaper preview" />
-                        <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors" />
+                        {/* 2. OPTIMIZACIÓN: Usamos Image con fill y sizes */}
+                        <Image 
+                          src={wp.url} 
+                          alt="Wallpaper preview" 
+                          fill 
+                          sizes="(max-width: 768px) 50vw, 33vw"
+                          className="object-cover transition-opacity group-hover:opacity-90"
+                          priority={activeTab === 'apariencia'} // Carga prioritaria si es la pestaña activa
+                        />
                         {currentWallpaper === wp.url && (
                           <div className="bg-blue-500 rounded-full p-1.5 shadow-xl z-10 border-2 border-white">
                             <Check className="text-white" size={14} strokeWidth={4} />
@@ -142,8 +141,14 @@ const AppSettings = ({ onClose, setWallpaper, currentWallpaper }: {
             {activeTab === 'perfil' && (
               <div className="animate-in slide-in-from-right-4 duration-300">
                 <div className="flex items-center gap-5 mb-10">
-                  <div className="w-20 h-20 rounded-full overflow-hidden shadow-xl border-4 border-white dark:border-zinc-800 shrink-0 bg-zinc-100 dark:bg-zinc-800">
-                    <img src="/photos/me/logo.png" alt="Ana Rita" className="w-full h-full object-cover" />
+                  <div className="relative w-20 h-20 rounded-full overflow-hidden shadow-xl border-4 border-white dark:border-zinc-800 shrink-0 bg-zinc-100 dark:bg-zinc-800">
+                    {/* 3. OPTIMIZACIÓN: Imagen de perfil */}
+                    <Image 
+                      src="/photos/me/logo.png" 
+                      alt="Ana Rita" 
+                      fill 
+                      className="object-cover"
+                    />
                   </div>
                   <div className="min-w-0">
                     <h3 className="text-2xl font-bold text-zinc-800 dark:text-white truncate tracking-tight">Ana Rita García Chau</h3>
@@ -182,23 +187,21 @@ const AppSettings = ({ onClose, setWallpaper, currentWallpaper }: {
             {activeTab === 'pantalla' && (
               <div className="animate-in slide-in-from-right-4 duration-300">
                 <h3 className="text-2xl font-bold text-zinc-800 dark:text-white mb-6 tracking-tight">Pantalla</h3>
-                
                 <div 
                   onClick={toggleDarkMode}
                   className="bg-zinc-50 dark:bg-zinc-900 p-5 rounded-[24px] flex justify-between items-center border border-zinc-100 dark:border-zinc-800 cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all shadow-sm"
                 >
                   <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white shadow-lg shadow-blue-200 dark:shadow-none">
+                    <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white">
                       {isDarkMode ? <Moon size={20} /> : <Sun size={20} />}
                     </div>
                     <div>
                       <p className="text-zinc-800 dark:text-white font-bold">Modo Oscuro</p>
                       <p className="text-zinc-500 dark:text-zinc-400 text-xs mt-1">
-                        {isDarkMode ? 'Desactivar para ver colores claros' : 'Activar para descansar la vista'}
+                        {isDarkMode ? 'Desactivar modo oscuro' : 'Activar modo oscuro'}
                       </p>
                     </div>
                   </div>
-                  
                   <div className={`w-14 h-7 rounded-full transition-all duration-300 p-1 relative ${isDarkMode ? 'bg-blue-500' : 'bg-zinc-300 dark:bg-zinc-700'}`}>
                     <div className={`bg-white w-5 h-5 rounded-full shadow-md transition-all duration-300 transform ${isDarkMode ? 'translate-x-7' : 'translate-x-0'}`}></div>
                   </div>
